@@ -11,7 +11,7 @@
 
     <logger name="org.codefilarete.stalactite.sql.statement" level="TRACE"/>
 
-    <logger name="org.codefilarete.stalactite" level="DEBUG"/>
+<!--    <logger name="org.codefilarete.stalactite" level="DEBUG"/>-->
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />
