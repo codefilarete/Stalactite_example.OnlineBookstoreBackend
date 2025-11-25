@@ -21,6 +21,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.jdbc.datasource.DriverManagerDataSource;
 import org.springframework.test.context.ContextConfiguration;
+import org.testcontainers.containers.JdbcDatabaseContainer;
+import org.testcontainers.containers.PostgreSQLContainer;
 
 import javax.sql.DataSource;
 import java.util.Optional;
@@ -102,17 +104,23 @@ public class RoleRepositoryTest {
 
     @TestConfiguration
     public static class TestDataSourceConfig {
-
-        @Bean
-        @Primary
-        public DataSource dataSource() {
-            DriverManagerDataSource dataSource = new DriverManagerDataSource();
-            dataSource.setDriverClassName("org.postgresql.Driver");
-            dataSource.setUrl("jdbc:postgresql://localhost:5432/postgres?currentSchema=bookstore");
-            dataSource.setUsername("admin");
-            dataSource.setPassword("admin");
-            return dataSource;
-        }
+		
+		@Bean
+		public PostgreSQLContainer<?> database() {
+			PostgreSQLContainer<?> postgreSQLContainer = new PostgreSQLContainer<>("postgres:14.11");
+			postgreSQLContainer.start();
+			return postgreSQLContainer;
+		}
+		
+		@Bean
+		@Primary
+		public DataSource dataSource(JdbcDatabaseContainer<?> database) {
+			DriverManagerDataSource dataSource = new DriverManagerDataSource();
+			dataSource.setUrl(database.getJdbcUrl());
+			dataSource.setUsername(database.getUsername());
+			dataSource.setPassword(database.getPassword());
+			return dataSource;
+		}
 
         @Bean
         public PersistenceContext persistenceContext(DataSource dataSource) {
